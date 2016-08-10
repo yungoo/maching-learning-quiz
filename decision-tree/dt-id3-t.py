@@ -9,7 +9,7 @@ def calcShannonEnt(dataSet):
     """
     输入：数据集
     输出：数据集的香农熵
-    描述：计算给定数据集的香农熵；熵越大，数据集的混乱程度越大
+    描述：计算给定数据集的香农熵
     """
     numEntries = len(dataSet)
     labelCounts = {}
@@ -46,24 +46,19 @@ def chooseBestFeatureToSplit(dataSet):
     """
     numFeatures = len(dataSet[0]) - 1
     baseEntropy = calcShannonEnt(dataSet)
-    bestInfoGainRatio = 0.0
+    bestInfoGain = 0.0
     bestFeature = -1
     for i in range(numFeatures):
         featList = [example[i] for example in dataSet]
         uniqueVals = set(featList)
         newEntropy = 0.0
-        splitInfo = 0.0
         for value in uniqueVals:
             subDataSet = splitDataSet(dataSet, i, value)
             prob = len(subDataSet)/float(len(dataSet))
             newEntropy += prob * calcShannonEnt(subDataSet)
-            splitInfo += -prob * log(prob, 2)
         infoGain = baseEntropy - newEntropy
-        if (splitInfo == 0): # fix the overflow bug
-            continue
-        infoGainRatio = infoGain / splitInfo
-        if (infoGainRatio > bestInfoGainRatio):
-            bestInfoGainRatio = infoGainRatio
+        if (infoGain > bestInfoGain):
+            bestInfoGain = infoGain
             bestFeature = i
     return bestFeature
 
@@ -189,49 +184,16 @@ def createTestSet():
                [2, 1, 0, 1]]
     return testSet
 
-# def main():
-#     dataSet, labels = createDataSet()
-#     labels_tmp = labels[:] # 拷贝，createTree会改变labels
-#     desicionTree = createTree(dataSet, labels_tmp)
-#     #storeTree(desicionTree, 'classifierStorage.txt')
-#     #desicionTree = grabTree('classifierStorage.txt')
-#     print('desicionTree:\n', desicionTree)
-#     treePlotter.createPlot(desicionTree)
-#     testSet = createTestSet()
-#     print('classifyResult:\n', classifyAll(desicionTree, labels, testSet))
-
-def createDataSet2():
-    my_data=[['slashdot','USA','yes',18,'None'],
-        ['google','France','yes',23,'Premium'],
-        ['digg','USA','yes',24,'Basic'],
-        ['kiwitobes','France','yes',23,'Basic'],
-        ['google','UK','no',21,'Premium'],
-        ['(direct)','New Zealand','no',12,'None'],
-        ['(direct)','UK','no',21,'Basic'],
-        ['google','USA','no',24,'Premium'],
-        ['slashdot','France','yes',19,'None'],
-        ['digg','USA','no',18,'None'],
-        ['google','UK','no',18,'None'],
-        ['kiwitobes','UK','no',19,'None'],
-        ['digg','New Zealand','yes',12,'Basic'],
-        ['slashdot','UK','no',21,'None'],
-        ['google','UK','yes',18,'Basic'],
-        ['kiwitobes','France','yes',19,'Basic']]
-
-    labels = ['company', 'country', 'bool', 'age']
-    return (my_data, labels)
-
 def main():
-    dataSet, labels = createDataSet2()
-
+    dataSet, labels = createDataSet()
     labels_tmp = labels[:] # 拷贝，createTree会改变labels
     desicionTree = createTree(dataSet, labels_tmp)
     #storeTree(desicionTree, 'classifierStorage.txt')
     #desicionTree = grabTree('classifierStorage.txt')
     print('desicionTree:\n', desicionTree)
     treePlotter.createPlot(desicionTree)
-    # testSet = createTestSet()
-    # print('classifyResult:\n', classifyAll(desicionTree, labels, testSet))
+    testSet = createTestSet()
+    print('classifyResult:\n', classifyAll(desicionTree, labels, testSet))
 
 if __name__ == '__main__':
     main()
